@@ -1,0 +1,45 @@
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+/raw
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# IDE related
+.idea
+
+# Optional eslint cache
+.eslintcache
+
+.vscode
+dist
+dist.new
+*.tsbuildinfo
+*.tgz
+/*.sql
+.cache
+.turbo
+.rollup.cache
+dist-dts
+rollup.config-*.mjs
+*.log
+.DS_Store
+drizzle-seed/src/dev

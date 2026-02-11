@@ -1,0 +1,277 @@
+{
+  "id": "6753c3ba-6661-4b2f-aec5-d362172ac1c6",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.current_usages": {
+      "name": "current_usages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "hospital_id": {
+          "name": "hospital_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "drug_id": {
+          "name": "drug_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "current_usages_hospital_id_hospitals_id_fk": {
+          "name": "current_usages_hospital_id_hospitals_id_fk",
+          "tableFrom": "current_usages",
+          "tableTo": "hospitals",
+          "columnsFrom": [
+            "hospital_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "current_usages_drug_id_drugs_drug_code_fk": {
+          "name": "current_usages_drug_id_drugs_drug_code_fk",
+          "tableFrom": "current_usages",
+          "tableTo": "drugs",
+          "columnsFrom": [
+            "drug_id"
+          ],
+          "columnsTo": [
+            "drug_code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.drugs": {
+      "name": "drugs",
+      "schema": "",
+      "columns": {
+        "fda_class": {
+          "name": "fda_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ingredient_code": {
+          "name": "ingredient_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "drug_code": {
+          "name": "drug_code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "drug_name": {
+          "name": "drug_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "manufactor": {
+          "name": "manufactor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "atc_code": {
+          "name": "atc_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "atc_name": {
+          "name": "atc_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "drugs_atc_5_atc_codes_id_fk": {
+          "name": "drugs_atc_5_atc_codes_id_fk",
+          "tableFrom": "drugs",
+          "tableTo": "atc_codes",
+          "columnsFrom": [
+            "atc_5"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.hospitals": {
+      "name": "hospitals",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.supply_predictions": {
+      "name": "supply_predictions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "hospital_id": {
+          "name": "hospital_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "drug_id": {
+          "name": "drug_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "upper": {
+          "name": "upper",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lower": {
+          "name": "lower",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "supply_predictions_hospital_id_hospitals_id_fk": {
+          "name": "supply_predictions_hospital_id_hospitals_id_fk",
+          "tableFrom": "supply_predictions",
+          "tableTo": "hospitals",
+          "columnsFrom": [
+            "hospital_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "supply_predictions_drug_id_drugs_drug_code_fk": {
+          "name": "supply_predictions_drug_id_drugs_drug_code_fk",
+          "tableFrom": "supply_predictions",
+          "tableTo": "drugs",
+          "columnsFrom": [
+            "drug_id"
+          ],
+          "columnsTo": [
+            "drug_code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
