@@ -6,10 +6,7 @@
 
 <div class="login-card">
 	<div class="brand" style="justify-content: center;">
-		<div class="brand-badge">H</div>
-		<div>
-			<div>MTECH</div>
-		</div>
+		<img src="/company_logo.png" alt="App Hospital" class="brand-logo" />
 	</div>
 
 	<form class="login-form" method="POST">
