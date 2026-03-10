@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { drizzleDb } from '$lib/server/db';
-import { auctionRegInventory } from '$lib/server/db/schema';
+import { auctionRegInventory, drugs } from '$lib/server/db/schema';
 import { and, eq, gt, inArray } from 'drizzle-orm';
 
 const toMinuteLabel = (date: Date) => {
@@ -48,18 +48,19 @@ export const GET: RequestHandler = async ({ locals }) => {
 	const activeOrderRows =
 		alarmDrugIds.length > 0
 			? await drizzleDb
-					.select({ drugId: auctionRegInventory.drugId })
+					.select({ atcId: drugs.atc5 })
 					.from(auctionRegInventory)
+					.innerJoin(drugs, eq(auctionRegInventory.drugId, drugs.drugCode))
 					.where(
 						and(
 							eq(auctionRegInventory.hospitalId, hospitalId),
-							inArray(auctionRegInventory.drugId, alarmDrugIds),
+							inArray(drugs.atc5, alarmDrugIds),
 							gt(auctionRegInventory.expireAt, now)
 						)
 					)
 			: [];
 
-	const activeDrugIds = new Set(activeOrderRows.map((row) => row.drugId));
+	const activeDrugIds = new Set(activeOrderRows.map((row) => row.atcId));
 
 	for (const row of alarmRows) {
 		if (activeDrugIds.has(row.drugId)) {

@@ -71,12 +71,12 @@
 
 <section class="card reset-card">
 	<h3>데모 관리</h3>
-	<p class="muted">시연 후 실제/환자 데이터는 12/01부터 제거하고, 예측 데이터는 12/08부터 제거해 12/07 기준 상태로 되돌립니다.</p>
+	<p class="muted">시연 후 실제/환자 데이터는 12/01부터 제거하고, 예측/주문 데이터는 12/08부터 제거해 12/07 기준 상태로 되돌립니다.</p>
 	<button class="button" type="button" on:click={() => (confirmOpen = true)}>데모 초기화</button>
 </section>
 
 <Modal open={confirmOpen} title="데모 초기화" on:close={() => (confirmOpen = false)}>
-	<p class="modal-body">실제/환자 데이터(12/01 이후)와 예측 데이터(12/08 이후)를 초기화하고 12/07 기준 상태로 복원하시겠습니까?</p>
+	<p class="modal-body">실제/환자 데이터(12/01 이후)와 예측/주문 데이터(12/08 이후)를 초기화하고 12/07 기준 상태로 복원하시겠습니까?</p>
 	<div slot="footer">
 		<button class="button" type="button" on:click={runReset} disabled={resetting}>
 			{resetting ? '초기화 중...' : '초기화 실행'}

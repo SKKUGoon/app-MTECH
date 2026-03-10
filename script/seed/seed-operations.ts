@@ -1,11 +1,12 @@
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { and, desc, eq, gte, lte, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 import {
 	atcCodes,
 	auctionBids,
 	auctionRegInventory,
 	configurations,
+	drugs,
 	inventory,
 	usages,
 	users
@@ -31,7 +32,8 @@ const db = drizzle(pool);
 const TARGET_HOSPITAL_ID = 'HOSP0001';
 const START_DATE_STR = '2024-12-01';
 const END_DATE_STR = '2024-12-07';
-const now = new Date();
+const BASELINE_DATE = new Date('2024-12-07T23:59:59.999Z');
+const now = new Date(BASELINE_DATE);
 
 const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const toNumeric = (value: number) => value.toFixed(2);
@@ -65,6 +67,11 @@ const pickN = <T>(rows: T[], count: number) => {
 		[copied[i], copied[j]] = [copied[j], copied[i]];
 	}
 	return copied.slice(0, Math.max(0, Math.min(count, copied.length)));
+};
+const shiftDays = (value: Date, days: number) => {
+	const next = new Date(value);
+	next.setDate(next.getDate() + days);
+	return next;
 };
 
 const requestedHospital = process.env.SEED_HOSPITAL_ID?.trim();
@@ -217,21 +224,43 @@ if (inventoryRows.length > 0) {
 const latestDate = dateStrs[dateStrs.length - 1];
 const latestInventoryRows = inventoryRows.filter((row) => row.dateStr === latestDate);
 const auctionCandidates = pickN(latestInventoryRows, 8);
+const candidateAtcIds = Array.from(new Set(auctionCandidates.map((row) => row.drugId)));
+const candidateDrugRows =
+	candidateAtcIds.length > 0
+		? await db
+				.select({ atc5: drugs.atc5, drugCode: drugs.drugCode })
+				.from(drugs)
+				.where(inArray(drugs.atc5, candidateAtcIds))
+		: [];
+const drugCodesByAtc = new Map<string, string[]>();
+
+for (const row of candidateDrugRows) {
+	const existing = drugCodesByAtc.get(row.atc5) ?? [];
+	drugCodesByAtc.set(row.atc5, [...existing, row.drugCode]);
+}
 
 for (const row of auctionCandidates) {
+	const candidateDrugCodes = drugCodesByAtc.get(row.drugId) ?? [];
+	if (candidateDrugCodes.length === 0) {
+		continue;
+	}
+
+	const selectedDrugCode = candidateDrugCodes[randomInt(0, candidateDrugCodes.length - 1)];
 	const auctionQty = Math.max(1, Math.round(Number(row.quantity) * 1.5));
-	const expireAt = new Date(`${latestDate}T00:00:00.000Z`);
-	expireAt.setDate(expireAt.getDate() + randomInt(4, 20));
+	const createdAt = shiftDays(BASELINE_DATE, -randomInt(2, 140));
+	createdAt.setHours(randomInt(8, 19), randomInt(0, 59), 0, 0);
+	const expireAt = shiftDays(createdAt, randomInt(2, 20));
+	const updatedAt = new Date(createdAt);
 
 	const [inserted] = await db
 		.insert(auctionRegInventory)
 		.values({
 			hospitalId: row.hospitalId,
-			drugId: row.drugId,
+			drugId: selectedDrugCode,
 			quantity: toNumeric(auctionQty),
 			expireAt,
-			createdAt: now,
-			updatedAt: now
+			createdAt,
+			updatedAt
 		})
 		.returning({ id: auctionRegInventory.id });
 
@@ -240,13 +269,16 @@ for (const row of auctionCandidates) {
 
 	if (bidders.length > 0) {
 		await db.insert(auctionBids).values(
-			bidders.map((bidder, index) => ({
-				regInventoryId: inserted.id,
-				userId: bidder.id,
-				price: toNumeric(basePrice + index * randomInt(1, 5) + Math.random()),
-				createdAt: now,
-				updatedAt: now
-			}))
+			bidders.map((bidder, index) => {
+				const bidCreatedAt = shiftDays(createdAt, randomInt(0, 2));
+				return {
+					createdAt: bidCreatedAt,
+					updatedAt: bidCreatedAt,
+					regInventoryId: inserted.id,
+					userId: bidder.id,
+					price: toNumeric(basePrice + index * randomInt(1, 5) + Math.random())
+				};
+			})
 		);
 	}
 }

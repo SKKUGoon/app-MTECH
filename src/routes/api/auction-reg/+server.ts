@@ -1,7 +1,8 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { drizzleDb } from '$lib/server/db';
-import { auctionRegInventory } from '$lib/server/db/schema';
+import { auctionRegInventory, drugs } from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 
 const addDays = (value: Date, days: number) => {
 	const next = new Date(value);
@@ -26,6 +27,16 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 	if (!Number.isInteger(quantity) || quantity <= 0) {
 		return json({ message: 'quantity must be a positive integer.' }, { status: 400 });
+	}
+
+	const [drugRow] = await drizzleDb
+		.select({ drugCode: drugs.drugCode })
+		.from(drugs)
+		.where(eq(drugs.drugCode, drugId))
+		.limit(1);
+
+	if (!drugRow) {
+		return json({ message: '유효하지 않은 약품 코드입니다.' }, { status: 400 });
 	}
 
 	const createdAt = new Date();

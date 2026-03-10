@@ -125,7 +125,7 @@ export const auctionRegInventory = pgTable('auction_reg_inventory', {
 		.references(() => users.id)
 		.notNull(),
 	drugId: text('drug_id')
-		.references(() => atcCodes.id)
+		.references(() => drugs.drugCode)
 		.notNull(),
 	quantity: numeric('quantity').notNull(),
 	expireAt: timestamp('expire_at', { withTimezone: true }).notNull(),

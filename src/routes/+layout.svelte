@@ -12,7 +12,7 @@
 	const navItems = [
 		{ label: '대시보드', path: '/dashboards', icon: 'dashboard' },
 		{ label: '데이터 입력', path: '/data-input', icon: 'edit_note' },
-		{ label: '주문', path: '/order', icon: 'shopping_cart' },
+		{ label: '재고 역경매', path: '/order', icon: 'shopping_cart' },
 		{ label: '설정', path: '/settings', icon: 'settings' }
 	];
 

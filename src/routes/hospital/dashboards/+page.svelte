@@ -173,9 +173,32 @@
 		}
 	};
 
+	const getWaitPieLegendLimit = () => {
+		if (typeof window === 'undefined') return 6;
+		if (window.innerWidth <= 720) return 4;
+		if (window.innerWidth <= 1080) return 5;
+		return 6;
+	};
+
+	const buildWaitPieDisplayData = (rawData: PieDatum[]) => {
+		const sorted = [...rawData].sort((a, b) => b.value - a.value);
+		const limit = getWaitPieLegendLimit();
+
+		if (sorted.length <= limit) {
+			return sorted;
+		}
+
+		const top = sorted.slice(0, limit - 1);
+		const others = sorted.slice(limit - 1);
+		const othersValue = others.reduce((sum, item) => sum + item.value, 0);
+
+		return othersValue > 0 ? [...top, { name: '기타', value: othersValue }] : top;
+	};
+
 	const renderWaitPie = () => {
 		if (!waitPieChart) return;
 		const slide = waitPieSlides[waitPieIndex];
+		const chartData = buildWaitPieDisplayData(slide.data);
 		const total = slide.data.reduce((sum: number, item: PieDatum) => sum + item.value, 0);
 		waitPieChart.setOption({
 			animationDuration: 600,
@@ -187,7 +210,7 @@
 				orient: 'vertical',
 				right: 8,
 				top: 'center',
-				data: slide.data.map((d) => d.name),
+				data: chartData.map((d) => d.name),
 				itemWidth: 14,
 				itemGap: 12,
 				textStyle: {
@@ -212,7 +235,7 @@
 						scale: true,
 						scaleSize: 8
 					},
-					data: slide.data
+					data: chartData
 				}
 			],
 			graphic:
@@ -541,7 +564,19 @@
 	</div>
 
 	<div class="accuracy-panel">
-		<Card title="최근 4주 평균 모델 정확도" subtitle="실사용량 <= 예측 상한이면 정확(약품별 주간 평균 후 주차 평균)">
+		<Card title="최근 4주 평균 모델 정확도">
+			<div class="panel-info-wrap">
+				<button
+					type="button"
+					class="panel-info-trigger"
+					aria-label="최근 4주 평균 모델 정확도 계산 기준 보기"
+				>
+					i
+				</button>
+				<div class="panel-info-tooltip" role="tooltip">
+					실사용량 &lt;= 예측 상한이면 정확(약품별 주간 평균 후 주차 평균)
+				</div>
+			</div>
 			<div class="accuracy-chart-wrap">
 				<canvas bind:this={activityCanvas}></canvas>
 			</div>
@@ -553,7 +588,6 @@
 			<div class="usage-card-header">
 				<div class="usage-title-row">
 					<h3>약품 사용량</h3>
-					<p class="muted">실제 사용량과 예측 범위</p>
 				</div>
 				<div class="usage-select-row">
 					<div class="usage-select-wrap">
@@ -798,6 +832,58 @@
 		height: var(--dashboard-top-panel-height);
 		display: flex;
 		flex-direction: column;
+		position: relative;
+	}
+
+	.panel-info-wrap {
+		position: absolute;
+		top: 16px;
+		right: 16px;
+		z-index: 2;
+	}
+
+	.panel-info-trigger {
+		width: 20px;
+		height: 20px;
+		border-radius: 999px;
+		border: 1px solid rgba(107, 122, 140, 0.35);
+		background: rgba(255, 255, 255, 0.9);
+		color: var(--muted);
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		cursor: help;
+	}
+
+	.panel-info-tooltip {
+		position: absolute;
+		top: calc(100% + 8px);
+		right: 0;
+		min-width: 240px;
+		max-width: 280px;
+		padding: 8px 10px;
+		border-radius: 8px;
+		font-size: 0.78rem;
+		line-height: 1.4;
+		color: #fff;
+		background: rgba(29, 35, 42, 0.95);
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-4px);
+		transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+		pointer-events: none;
+	}
+
+	.panel-info-wrap:hover .panel-info-tooltip,
+	.panel-info-trigger:focus + .panel-info-tooltip,
+	.panel-info-trigger:focus-visible + .panel-info-tooltip {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
 	}
 
 	.usage-panel {

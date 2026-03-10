@@ -176,7 +176,7 @@ ALTER TABLE "outpatient_patients" ADD CONSTRAINT "outpatient_patients_hospital_i
 --> statement-breakpoint
 ALTER TABLE "auction_reg_inventory" ADD CONSTRAINT "auction_reg_inventory_hospital_id_users_id_fk" FOREIGN KEY ("hospital_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
 --> statement-breakpoint
-ALTER TABLE "auction_reg_inventory" ADD CONSTRAINT "auction_reg_inventory_drug_id_atc_codes_id_fk" FOREIGN KEY ("drug_id") REFERENCES "public"."atc_codes"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "auction_reg_inventory" ADD CONSTRAINT "auction_reg_inventory_drug_id_drugs_drug_code_fk" FOREIGN KEY ("drug_id") REFERENCES "public"."drugs"("drug_code") ON DELETE no action ON UPDATE no action;
 --> statement-breakpoint
 ALTER TABLE "auction_bids" ADD CONSTRAINT "auction_bids_reg_inventory_id_auction_reg_inventory_id_fk" FOREIGN KEY ("reg_inventory_id") REFERENCES "public"."auction_reg_inventory"("id") ON DELETE no action ON UPDATE no action;
 --> statement-breakpoint
